@@ -58,7 +58,7 @@ export default function Footer() {
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
               <li style={{ marginBottom: "0.75rem" }}>
                 <a
-                  href="#services"
+                  href="services"
                   style={{ color: "#cbd5e1", textDecoration: "none" }}
                 >
                   Services
@@ -66,20 +66,13 @@ export default function Footer() {
               </li>
               <li style={{ marginBottom: "0.75rem" }}>
                 <a
-                  href="#features"
+                  href="Register"
                   style={{ color: "#cbd5e1", textDecoration: "none" }}
                 >
-                  Features
+                  Register
                 </a>
               </li>
-              <li style={{ marginBottom: "0.75rem" }}>
-                <a
-                  href="#pricing"
-                  style={{ color: "#cbd5e1", textDecoration: "none" }}
-                >
-                  Pricing
-                </a>
-              </li>
+              
               <li style={{ marginBottom: "0.75rem" }}>
                 <a
                   href="#contact"
@@ -109,7 +102,7 @@ export default function Footer() {
               }}
             >
               <a
-                href="tel:+919876543210"
+                href="tel:+91 9923400414"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -119,10 +112,10 @@ export default function Footer() {
                 }}
               >
                 <Phone style={{ width: 18, height: 18 }} aria-hidden="true" />
-                +91 98765 43210
+                +91 9923400414
               </a>
               <a
-                href="mailto:hello@punebus.com"
+                href="mailto:punebus2@gmail.com"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -132,7 +125,7 @@ export default function Footer() {
                 }}
               >
                 <Mail style={{ width: 18, height: 18 }} aria-hidden="true" />
-                hello@punebus.com
+                punebus2@gmail.com
               </a>
               <div
                 style={{
