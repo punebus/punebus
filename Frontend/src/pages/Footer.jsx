@@ -66,15 +66,6 @@ export default function Footer() {
               </li>
               <li style={{ marginBottom: "0.75rem" }}>
                 <a
-                  href="Register"
-                  style={{ color: "#cbd5e1", textDecoration: "none" }}
-                >
-                  Register
-                </a>
-              </li>
-              
-              <li style={{ marginBottom: "0.75rem" }}>
-                <a
                   href="#contact"
                   style={{ color: "#cbd5e1", textDecoration: "none" }}
                 >

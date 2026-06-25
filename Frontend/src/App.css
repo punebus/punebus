@@ -1,0 +1,169 @@
+.app-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #f8fafc;
+}
+
+.app-main {
+  min-height: calc(100vh - 68px);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --mobile-app-nav-height: 0px;
+  }
+
+  html {
+    background: #eef6ff;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    overscroll-behavior-y: contain;
+    -webkit-tap-highlight-color: transparent;
+    background:
+      linear-gradient(180deg, #eff6ff 0%, #f8fafc 42%, #ecfdf5 100%);
+  }
+
+  .app-shell {
+    max-width: 480px;
+    min-height: 100dvh;
+    margin: 0 auto;
+    overflow-x: hidden;
+    background: #f8fafc;
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.12);
+  }
+
+  .app-main {
+    min-height: calc(100dvh - var(--nav-height));
+  }
+
+  .home-shell,
+  .pp-shell {
+    width: min(100% - 20px, 480px) !important;
+  }
+
+  .services-app-page {
+    width: min(100%, 480px) !important;
+    padding: 22px 10px 34px !important;
+  }
+
+  .services-app-title {
+    font-size: 1.7rem !important;
+    line-height: 1.1 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .services-app-subtitle {
+    max-width: 320px !important;
+    margin: 0 auto 18px !important;
+    font-size: 0.9rem !important;
+    line-height: 1.45 !important;
+  }
+
+  .services-package-strip {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(104px, 1fr)) !important;
+    gap: 8px !important;
+    margin: 0 -2px 24px !important;
+    overflow: visible !important;
+  }
+
+  .services-package-card {
+    min-width: 0 !important;
+    min-height: 390px !important;
+    border-radius: 18px !important;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12) !important;
+  }
+
+  .services-package-head {
+    min-height: 116px !important;
+    padding: 16px 8px !important;
+  }
+
+  .services-package-icon {
+    margin-bottom: 8px !important;
+    font-size: 1.8rem !important;
+  }
+
+  .services-package-title {
+    font-size: 0.86rem !important;
+    line-height: 1.12 !important;
+    margin-bottom: 4px !important;
+    overflow-wrap: anywhere;
+  }
+
+  .services-package-subtitle {
+    font-size: 0.62rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .services-package-body {
+    padding: 10px 7px !important;
+  }
+
+  .services-package-list {
+    display: grid !important;
+    gap: 7px !important;
+  }
+
+  .services-package-service {
+    width: 100% !important;
+    min-height: 44px !important;
+    align-items: center !important;
+    padding: 7px !important;
+    margin-bottom: 0 !important;
+    border-radius: 12px !important;
+    text-align: left !important;
+  }
+
+  .services-package-service-icon {
+    width: 28px !important;
+    height: 28px !important;
+    margin-right: 7px !important;
+    font-size: 0.88rem !important;
+  }
+
+  .services-package-service-title {
+    display: -webkit-box;
+    margin-bottom: 0 !important;
+    overflow: hidden;
+    color: #0f172a !important;
+    font-size: 0.69rem !important;
+    line-height: 1.18 !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .services-package-service-desc {
+    display: none !important;
+  }
+
+  .services-package-cta {
+    min-height: 38px !important;
+    margin-top: 10px !important;
+    padding: 9px 6px !important;
+    border-radius: 12px !important;
+    font-size: 0.7rem !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .services-package-strip {
+    grid-template-columns: repeat(3, minmax(96px, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .services-package-card {
+    min-height: 374px !important;
+  }
+
+  .services-package-title {
+    font-size: 0.78rem !important;
+  }
+
+  .services-package-service-title {
+    font-size: 0.64rem !important;
+  }
+
+}

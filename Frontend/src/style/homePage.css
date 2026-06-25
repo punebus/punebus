@@ -1,0 +1,149 @@
+.home-shell {
+  width: min(1280px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.home-hero-kicker {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fef3c7;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.home-hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.home-hero-tags span {
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 750;
+}
+
+.home-overview {
+  position: relative;
+  padding: 54px 0 70px;
+  background: #ffffff;
+}
+
+.home-overview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(300px, 1.05fr);
+  gap: 28px;
+  align-items: end;
+}
+
+.home-eyebrow {
+  margin: 0 0 12px;
+  color: #d97706;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.home-overview h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(1.85rem, 4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.home-overview p {
+  margin: 16px 0 0;
+  color: #475569;
+  line-height: 1.75;
+  font-size: 1.02rem;
+}
+
+.home-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.home-stat-card,
+.home-point-card {
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #f8fafc;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+}
+
+.home-stat-card {
+  padding: 20px;
+}
+
+.home-stat-card strong {
+  display: block;
+  color: #1d4ed8;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.home-stat-card span {
+  display: block;
+  margin-top: 10px;
+  color: #334155;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.home-point-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.home-point-card {
+  padding: 22px;
+  background: #ffffff;
+}
+
+.home-point-card h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.12rem;
+}
+
+.home-point-card p {
+  margin-top: 10px;
+  font-size: 0.96rem;
+}
+
+@media (max-width: 900px) {
+  .home-overview-grid,
+  .home-point-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .home-shell {
+    width: min(100% - 24px, 1280px);
+  }
+
+  .home-hero {
+    min-height: 600px !important;
+  }
+
+  .home-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,6 +1,7 @@
 // controllers/enquiryController.js
 import Enquiry from "../models/Enquiry.js";
 import { validationResult } from "express-validator";
+import { sendEmail } from "../utils/email.js";
 
 export const createEnquiry = async (req, res) => {
   const errors = validationResult(req);
@@ -91,4 +92,36 @@ export const updateEnquiryStatus = async (req, res) => {
     console.error("updateEnquiryStatus:", err);
     res.status(500).json({ message: "Server error while updating status" });
   }
+};
+
+export const respondToEnquiry = async (req, res) => {
+  const { id } = req.params;
+  const { responseMessage } = req.body;
+  const message = String(responseMessage || "").trim();
+
+  if (!message) {
+    return res.status(400).json({ message: "responseMessage is required" });
+  }
+
+  const enquiry = await Enquiry.findById(id);
+  if (!enquiry) return res.status(404).json({ message: "Enquiry not found" });
+
+  enquiry.responseMessage = message;
+  enquiry.status = "done";
+  enquiry.respondedBy = req.user?._id;
+  enquiry.respondedByRole = req.user?.role;
+  enquiry.respondedAt = new Date();
+  await enquiry.save();
+
+  const emailResult = await sendEmail({
+    to: enquiry.email,
+    subject: "PuneBus enquiry response",
+    text: `Hello ${enquiry.contactPersonName || "Customer"},\n\nThank you for contacting PuneBus.\n\n${message}\n\nPuneBus Team`,
+  });
+
+  res.json({
+    message: "Enquiry response saved",
+    enquiry,
+    emailSent: emailResult.sent,
+  });
 };

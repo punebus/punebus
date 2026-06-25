@@ -7,8 +7,9 @@ import {
   getEnquiry,
   deleteEnquiry,
   updateEnquiryStatus,
+  respondToEnquiry,
 } from "../controllers/enquiryController.js";
-import { protect, adminOnly } from "../middleware/auth.js";
+import { protect, adminOnly, roleOnly } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -43,17 +44,25 @@ router.post(
   createEnquiry
 );
 
-// admin endpoints
-router.get("/", protect, adminOnly, listEnquiries);
-router.get("/:id", protect, adminOnly, getEnquiry);
+// panel endpoints
+router.get("/", protect, roleOnly(["admin", "manager", "executor"]), listEnquiries);
+router.get("/:id", protect, roleOnly(["admin", "manager", "executor"]), getEnquiry);
 router.delete("/:id", protect, adminOnly, deleteEnquiry);
 
 router.put(
   "/:id/status",
   protect,
-  adminOnly,
+  roleOnly(["admin", "manager", "executor"]),
   [body("status").isIn(["pending", "done"]).withMessage("invalid status")],
   updateEnquiryStatus
+);
+
+router.put(
+  "/:id/respond",
+  protect,
+  roleOnly(["admin", "manager", "executor"]),
+  [body("responseMessage").trim().notEmpty().withMessage("responseMessage required")],
+  respondToEnquiry
 );
 
 export default router;

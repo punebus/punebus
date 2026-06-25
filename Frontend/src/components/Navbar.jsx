@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { ShieldCheck } from 'lucide-react';
 import './navbar.css';
 import EnquiryForm from "../pages/EnquiryForm";
 
 const ModalPortal = ({ children, onClose }) => {
+  const onCloseRef = useRef(onClose);
   const [container] = useState(() => {
     let root = document.getElementById('modal-root');
     if (!root) {
@@ -18,6 +20,10 @@ const ModalPortal = ({ children, onClose }) => {
   });
 
   useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  useEffect(() => {
     const { root, wrapper } = container;
     root.appendChild(wrapper);
 
@@ -27,19 +33,23 @@ const ModalPortal = ({ children, onClose }) => {
     if (scrollBarWidth > 0) document.body.style.paddingRight = `${scrollBarWidth}px`;
     document.body.style.overflow = 'hidden';
 
-    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e) => { if (e.key === 'Escape') onCloseRef.current(); };
     window.addEventListener('keydown', onKey);
 
     return () => {
-      try { root.removeChild(wrapper); } catch {}
+      try {
+        root.removeChild(wrapper);
+      } catch {
+        // Portal node may already be removed during fast route changes.
+      }
       document.body.style.overflow = prevOverflow;
       document.body.style.paddingRight = prevPaddingRight;
       window.removeEventListener('keydown', onKey);
     };
-  }, []);
+  }, [container]);
 
   const handleBackdropClick = (e) => {
-    if (e.target.classList.contains('modal-backdrop')) onClose();
+    if (e.target.classList.contains('modal-backdrop')) onCloseRef.current();
   };
 
   return ReactDOM.createPortal(
@@ -56,26 +66,11 @@ const ModalPortal = ({ children, onClose }) => {
 };
 
 const Navbar = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showEnquiry, setShowEnquiry] = useState(false);
   const [exiting, setExiting] = useState(false);
-
-  const safeParse = (key) => {
-    try { return JSON.parse(localStorage.getItem(key) || 'null'); }
-    catch { return null; }
-  };
-
-  const user = safeParse('user');
-  const admin = safeParse('admin');
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('admin');
-    navigate('/');
-  };
+  const adminAppUrl = import.meta.env.VITE_ADMIN_APP_URL || 'http://127.0.0.1:5174';
 
   const toggleMobileMenu = () => setMobileMenuOpen((p) => !p);
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -104,7 +99,6 @@ const Navbar = () => {
     }, 300);
   };
 
-  const firstFocusRef = useRef(null);
   useEffect(() => {
     if (showEnquiry) {
       setTimeout(() => {
@@ -138,34 +132,8 @@ const Navbar = () => {
           <nav className={`links ${mobileMenuOpen ? 'active' : ''}`}>
             <Link to="/" onClick={closeMobileMenu} className={isActive('/') ? 'active' : ''}>Home</Link>
             <Link to="/services" onClick={closeMobileMenu} className={isActive('/services') ? 'active' : ''}>Services</Link>
-            <Link to="/register" onClick={closeMobileMenu} className={isActive('/register') ? 'active' : ''}>Register</Link>
-
-            {/* ✅ ADMIN — ONLY EMOJI */}
-            {!admin && (
-              <Link
-                to="/admin/login"
-                onClick={closeMobileMenu}
-                className={isActive('/admin/login') ? 'active with-icon' : 'with-icon'}
-                aria-label="Admin Login"
-              >
-                🛡️
-              </Link>
-            )}
-
-            {admin && (
-              <Link
-                to="/admin"
-                onClick={closeMobileMenu}
-                className={isActive('/admin') ? 'active with-icon' : 'with-icon'}
-                aria-label="Admin Dashboard"
-              >
-                🛡️
-              </Link>
-            )}
-
-            {(user || admin) && (
-              <button className="btn-logout" onClick={handleLogout}>Logout</button>
-            )}
+            <Link to="/provider" onClick={closeMobileMenu} className={isActive('/provider') ? 'active' : ''}>Provider</Link>
+            <Link to="/partner" onClick={closeMobileMenu} className={isActive('/partner') ? 'active' : ''}>Partner</Link>
 
             <button
               className="btn-enquiry highlight with-icon"

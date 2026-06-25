@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { verifyJwt } from "../utils/jwt.js";
 
 export const protect = async (req, res, next) => {
   let token;
@@ -15,9 +15,12 @@ export const protect = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = verifyJwt(token, process.env.JWT_SECRET);
     // attach user
     req.user = await User.findById(decoded.id).select("-password");
+    if (!req.user || !req.user.isActive) {
+      return res.status(401).json({ message: "Not authorized, user inactive or missing" });
+    }
     next();
   } catch (error) {
     console.error(error);
@@ -25,9 +28,11 @@ export const protect = async (req, res, next) => {
   }
 };
 
-export const adminOnly = (req, res, next) => {
-  if (!req.user || req.user.role !== "admin") {
-    return res.status(403).json({ message: "Admin access required" });
+export const roleOnly = (roles = []) => (req, res, next) => {
+  if (!req.user || !roles.includes(req.user.role)) {
+    return res.status(403).json({ message: "Access denied" });
   }
   next();
 };
+
+export const adminOnly = roleOnly(["admin"]);

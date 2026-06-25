@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-// ✅ In Vite, env vars must start with "VITE_"
-const BASE =
-  import.meta.env.VITE_API_BASE_URL || 'https://punebus.com';
+const RAW_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+const BASE = RAW_BASE.replace(/\/api\/?$/, '');
 
 const api = axios.create({
   baseURL: BASE,

@@ -155,10 +155,14 @@ export default function EnquiryForm({ onSuccess } = {}) {
   const handleOk = () => {
     try {
       if (typeof onSuccess === "function") onSuccess();
-    } catch (_) {}
+    } catch {
+      // Keep success close resilient even if parent callback fails.
+    }
     try {
       navigate("/", { replace: true });
-    } catch (_) {}
+    } catch {
+      // Navigation can fail if the component has already unmounted.
+    }
   };
 
   const FieldError = ({ msg, id }) =>

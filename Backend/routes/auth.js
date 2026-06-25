@@ -1,5 +1,12 @@
 import express from "express";
-import { registerUser, adminLogin } from "../controllers/authController.js";
+import {
+  registerUser,
+  adminLogin,
+  managerLogin,
+  executorLogin,
+  getMe,
+} from "../controllers/authController.js";
+import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -15,5 +22,9 @@ router.post("/register", registerUser);
  * Body: { email, password }
  */
 router.post("/admin/login", adminLogin);
+router.post("/manager/login", managerLogin);
+router.post("/executor/login", executorLogin);
+
+router.get("/me", protect, getMe);
 
 export default router;

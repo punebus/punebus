@@ -1,77 +1,177 @@
 // src/pages/Register.jsx
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import {
+  AlertCircle,
+  Building2,
+  BusFront,
+  CheckCircle2,
+  ClipboardList,
+  Fingerprint,
+  Mail,
+  MapPin,
+  PackageCheck,
+  Phone,
+  Route,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  UtensilsCrossed,
+  UserRound,
+  Wrench,
+} from "lucide-react";
 import api from "../api/apiClient";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import busImage from "../assets/replce_bus.jpg";
+import foodImage from "../assets/restorent.jpg";
+import parcelImage from "../assets/parcel.jpg";
+import mechanicImage from "../assets/mechanic.jpg";
+import cleanerImage from "../assets/cleaner.jpg";
+import driverImage from "../assets/driver.jpg";
+import "../style/register.css";
 
-const ROLE_OPTIONS = [
-  "driver",
-  "vendor",
-  "mechanic",
-  "cleaner",
-  "restaurant",
-  "parcel",
-];
+const ROLE_OPTIONS = ["driver", "vendor", "parcel", "mechanic", "cleaner"];
+const SUPPORTED_REGISTRATION_ROLES = [...ROLE_OPTIONS, "restaurant"];
 
-// Accept both direct role values and service slugs
-const normalizeRoleFromParam = (raw) => {
-  const v = (raw || "").toLowerCase();
+const ROLE_META = {
+  driver: {
+    label: "Driver",
+    hero: "Driver Registration",
+    subtitle:
+      "Register professional driving services for route operations, replacement shifts and travel support.",
+    servicePlaceholder: "Route driver, replacement shift, travel driver",
+    descriptionLabel: "Driving Experience",
+    image: driverImage,
+    icon: UserRound,
+    highlights: ["License details", "Route experience", "Shift availability", "Verified profile"],
+  },
+  vendor: {
+    label: "BusVendor",
+    hero: "BusVendor Registration",
+    subtitle:
+      "Share your fleet, charter or route support service for PuneBus review and approval.",
+    servicePlaceholder: "Bus rental, route backup, charter services",
+    descriptionLabel: "Service Description",
+    image: busImage,
+    icon: BusFront,
+    highlights: ["Fleet availability", "Route backup", "Charter support", "Depot details"],
+  },
+  restaurant: {
+    label: "Restaurant Partner",
+    hero: "Restaurant Partner Registration",
+    subtitle:
+      "List catering, meal or refreshment services for passenger and crew support.",
+    servicePlaceholder: "Meals, refreshments, bulk catering",
+    descriptionLabel: "Business Description",
+    image: foodImage,
+    icon: UtensilsCrossed,
+    highlights: ["Meal supply", "Crew support", "Bulk orders", "Service area"],
+  },
+  parcel: {
+    label: "ParcelVendor",
+    hero: "ParcelVendor Registration",
+    subtitle:
+      "Apply to support pickup, delivery and route-based logistics for PuneBus.",
+    servicePlaceholder: "Pickup slots, delivery support, route logistics",
+    descriptionLabel: "Partnership Description",
+    image: parcelImage,
+    icon: PackageCheck,
+    highlights: ["Pickup points", "Route delivery", "Tracking support", "Service timing"],
+  },
+  mechanic: {
+    label: "Mechanic",
+    hero: "Mechanic Registration",
+    subtitle:
+      "Register workshop or field mechanic services for breakdown support and vehicle maintenance.",
+    servicePlaceholder: "Breakdown support, diagnostics, depot maintenance",
+    descriptionLabel: "Repair Service Description",
+    image: mechanicImage,
+    icon: Wrench,
+    highlights: ["Breakdown response", "Diagnostics", "Spare coordination", "Depot service"],
+  },
+  cleaner: {
+    label: "Cleaner",
+    hero: "Cleaner Registration",
+    subtitle:
+      "Offer bus cleaning, washing and hygiene support for depots, scheduled routes and fleet upkeep.",
+    servicePlaceholder: "Interior cleaning, bus washing, depot hygiene",
+    descriptionLabel: "Cleaning Service Description",
+    image: cleanerImage,
+    icon: Sparkles,
+    highlights: ["Interior cleaning", "Washing support", "Hygiene checks", "Depot coverage"],
+  },
+};
+
+// Accept either role or service query parameter values.
+const normalizeRoleFromParam = (role, service) => {
+  const raw = String(role || service || "").toLowerCase();
 
   const aliasMap = {
-    // direct roles
-    driver: "driver",
-    cleaner: "cleaner",
-    mechanic: "mechanic",
     vendor: "vendor",
+    driver: "driver",
     restaurant: "restaurant",
     parcel: "parcel",
-
-    // slugs from service titles
+    mechanic: "mechanic",
+    cleaner: "cleaner",
+    "bus-vendor": "vendor",
+    busvendor: "vendor",
+    "bus-provider": "vendor",
     "professional-drivers": "driver",
-    "bus-cleaners": "cleaner",
-    "mechanic-support": "mechanic",
-    "replacement-bus": "vendor",
-    "emergency-services": "vendor",
-    "parcel-delivery": "parcel",
+    "driver-provider": "driver",
+    "temporary-bus-provider": "vendor",
+    "restaurant-vendor": "restaurant",
+    "hotel-vendor": "restaurant",
+    "parcel-partner": "parcel",
     "parcel-vendor": "parcel",
-    "parcel-vendors": "parcel",
-    "restaurant-services": "restaurant",
-    "restaurant-vendors": "restaurant",
+    parcelvendor: "parcel",
+    "mechanic-provider": "mechanic",
+    "cleaner-provider": "cleaner",
   };
 
-  const resolved = aliasMap[v];
-  return ROLE_OPTIONS.includes(resolved) ? resolved : "driver";
+  const resolved = aliasMap[raw] || raw;
+  return SUPPORTED_REGISTRATION_ROLES.includes(resolved) ? resolved : "vendor";
 };
+
+const createEmptyForm = (role) => ({
+  name: "",
+  phone: "",
+  email: "",
+  role,
+  AddharNo: "",
+  address: "",
+  providerDescription: "",
+  providerServices: "",
+});
 
 const Register = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
 
-  const incomingParam = searchParams.get("service");
-  const initialRole = normalizeRoleFromParam(incomingParam);
+  const incomingRole = searchParams.get("role");
+  const incomingService = searchParams.get("service");
+  const initialRole = normalizeRoleFromParam(incomingRole, incomingService);
 
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    role: initialRole,
-    AddharNo: "",
-    address: "",
-  });
-
-  useEffect(() => {
-    const updatedRole = normalizeRoleFromParam(incomingParam);
-    setForm((prev) =>
-      prev.role === updatedRole ? prev : { ...prev, role: updatedRole }
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [incomingParam]);
-
+  const [form, setForm] = useState(() => createEmptyForm(initialRole));
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  useEffect(() => {
+    const updatedRole = normalizeRoleFromParam(incomingRole, incomingService);
+    setForm((prev) =>
+      prev.role === updatedRole ? prev : { ...prev, role: updatedRole }
+    );
+  }, [incomingRole, incomingService]);
+
+  const currentRole = ROLE_META[form.role] || ROLE_META.vendor;
+  const CurrentRoleIcon = currentRole.icon;
+
+  const handleRolePick = (value) => {
+    setForm((prev) => ({ ...prev, role: value }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -83,17 +183,7 @@ const Register = () => {
       const successText = res?.data?.message || "Registered successfully!";
       setMsg({ type: "success", text: successText });
       setShowSuccessPopup(true);
-
-      // reset, but keep role from URL
-      setForm({
-        name: "",
-        phone: "",
-        email: "",
-        role: initialRole,
-        AddharNo: "",
-        address: "",
-      });
-
+      setForm(createEmptyForm(form.role));
       setTimeout(() => setShowSuccessPopup(false), 2500);
     } catch (err) {
       setMsg({
@@ -105,367 +195,229 @@ const Register = () => {
     }
   };
 
-  const styles = {
-    pageContainer: {
-      minHeight: "100vh",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "20px",
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    },
-    formWrapper: {
-      background: "#fff",
-      borderRadius: "20px",
-      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
-      padding: "40px",
-      maxWidth: "500px",
-      width: "100%",
-      animation: "slideIn 0.5s ease-out",
-    },
-    heading: {
-      textAlign: "center",
-      color: "#333",
-      fontSize: "28px",
-      fontWeight: "700",
-      marginBottom: "10px",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-      backgroundClip: "text",
-    },
-    subtitle: {
-      textAlign: "center",
-      color: "#666",
-      fontSize: "14px",
-      marginBottom: "30px",
-    },
-    form: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "20px",
-    },
-    label: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "8px",
-      fontSize: "14px",
-      fontWeight: "600",
-      color: "#333",
-    },
-    input: {
-      padding: "12px 16px",
-      border: "2px solid #e0e0e0",
-      borderRadius: "10px",
-      fontSize: "15px",
-      transition: "all 0.3s ease",
-      outline: "none",
-      backgroundColor: "#f9f9f9",
-    },
-    inputFocus: {
-      border: "2px solid #667eea",
-      backgroundColor: "#fff",
-      transform: "translateY(-2px)",
-      boxShadow: "0 4px 12px rgba(102, 126, 234, 0.2)",
-    },
-    select: {
-      padding: "12px 16px",
-      border: "2px solid #e0e0e0",
-      borderRadius: "10px",
-      fontSize: "15px",
-      transition: "all 0.3s ease",
-      outline: "none",
-      backgroundColor: "#f9f9f9",
-      cursor: "pointer",
-    },
-    textarea: {
-      padding: "12px 16px",
-      border: "2px solid #e0e0e0",
-      borderRadius: "10px",
-      fontSize: "15px",
-      transition: "all 0.3s ease",
-      outline: "none",
-      backgroundColor: "#f9f9f9",
-      minHeight: "80px",
-      resize: "vertical",
-      fontFamily: "inherit",
-    },
-    button: {
-      padding: "14px",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      color: "#fff",
-      border: "none",
-      borderRadius: "10px",
-      fontSize: "16px",
-      fontWeight: "700",
-      cursor: "pointer",
-      transition: "all 0.3s ease",
-      marginTop: "10px",
-      textTransform: "uppercase",
-      letterSpacing: "1px",
-    },
-    buttonHover: {
-      transform: "translateY(-2px)",
-      boxShadow: "0 8px 20px rgba(102, 126, 234, 0.4)",
-    },
-    buttonDisabled: {
-      opacity: "0.6",
-      cursor: "not-allowed",
-      transform: "none",
-    },
-    message: {
-      padding: "12px 16px",
-      borderRadius: "10px",
-      fontSize: "14px",
-      fontWeight: "500",
-      textAlign: "center",
-      marginTop: "10px",
-      animation: "fadeIn 0.3s ease",
-    },
-    messageSuccess: {
-      background: "#d4edda",
-      color: "#155724",
-      border: "1px solid #c3e6cb",
-    },
-    messageError: {
-      background: "#f8d7da",
-      color: "#721c24",
-      border: "1px solid #f5c6cb",
-    },
-    icon: {
-      fontSize: "12px",
-      color: "#999",
-      fontStyle: "italic",
-    },
-    popupOverlay: {
-      position: "fixed",
-      top: 0,
-      left: 0,
-      width: "100vw",
-      height: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "rgba(0,0,0,0.45)",
-      zIndex: 9999,
-    },
-    popupCard: {
-      background: "#fff",
-      padding: "24px 28px",
-      borderRadius: "12px",
-      boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-      maxWidth: "420px",
-      width: "90%",
-      textAlign: "center",
-    },
-    popupTitle: {
-      fontSize: "18px",
-      fontWeight: 700,
-      marginBottom: "8px",
-    },
-    popupText: {
-      fontSize: "14px",
-      color: "#444",
-      marginBottom: "12px",
-    },
-    popupClose: {
-      padding: "10px 14px",
-      borderRadius: "8px",
-      border: "none",
-      cursor: "pointer",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      color: "#fff",
-      fontWeight: 700,
-    },
-  };
-
-  const [focusedField, setFocusedField] = useState(null);
-  const [buttonHover, setButtonHover] = useState(false);
-
   return (
-    <div style={styles.pageContainer}>
-      <style>
-        {`
-          @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @media (max-width: 600px) {
-            .form-wrapper { padding: 25px !important; }
-            .heading { font-size: 24px !important; }
-          }
-        `}
-      </style>
+    <main className="register-page">
+      <section className="register-shell" aria-labelledby="provider-register-title">
+        <aside className="register-side">
+          <div className="register-side-media">
+            <img src={currentRole.image} alt="" />
+            <div className="register-side-badge">
+              <CurrentRoleIcon size={18} aria-hidden="true" />
+              <span>{currentRole.label}</span>
+            </div>
+          </div>
 
-      <div style={styles.formWrapper} className="form-wrapper">
-        <h2 style={styles.heading} className="heading">
-          User Registration
-        </h2>
-        <p style={styles.subtitle}>
-          Join PuneBus and start your journey with us
-        </p>
+          <div className="register-side-copy">
+            <p className="register-eyebrow">Provider Onboarding</p>
+            <h1 id="provider-register-title">{currentRole.hero}</h1>
+            <p>{currentRole.subtitle}</p>
+          </div>
 
-        <form onSubmit={submit} style={styles.form}>
-          <label style={styles.label}>
-            Name *
-            <input
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              onFocus={() => setFocusedField("name")}
-              onBlur={() => setFocusedField(null)}
-              style={{
-                ...styles.input,
-                ...(focusedField === "name" ? styles.inputFocus : {}),
-              }}
-              placeholder="Enter your full name"
-              required
-            />
-          </label>
+          <div className="register-highlight-grid" aria-label="Registration highlights">
+            {currentRole.highlights.map((item, index) => (
+              <div className="register-highlight" key={item}>
+                {index % 2 === 0 ? (
+                  <Route size={18} aria-hidden="true" />
+                ) : (
+                  <Building2 size={18} aria-hidden="true" />
+                )}
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
 
-          <label style={styles.label}>
-            Phone Number *
-            <input
-              name="phone"
-              type="tel"
-              value={form.phone}
-              onChange={handleChange}
-              onFocus={() => setFocusedField("phone")}
-              onBlur={() => setFocusedField(null)}
-              style={{
-                ...styles.input,
-                ...(focusedField === "phone" ? styles.inputFocus : {}),
-              }}
-              placeholder="Enter your phone number"
-              required
-            />
-          </label>
+          <div className="register-review-box">
+            <ShieldCheck size={24} aria-hidden="true" />
+            <div>
+              <strong>Admin review</strong>
+              <p>Your request goes to the PuneBus team for verification and approval.</p>
+            </div>
+          </div>
+        </aside>
 
-          <label style={styles.label}>
-            Email <span style={styles.icon}>(optional)</span>
-            <input
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              onFocus={() => setFocusedField("email")}
-              onBlur={() => setFocusedField(null)}
-              style={{
-                ...styles.input,
-                ...(focusedField === "email" ? styles.inputFocus : {}),
-              }}
-              placeholder="your.email@example.com"
-            />
-          </label>
+        <section className="register-form-panel" aria-label="Provider registration form">
+          <div className="register-form-head">
+            <p className="register-eyebrow">Choose Category</p>
+            <h2>Submit provider details</h2>
+          </div>
 
-          <label style={styles.label}>
-            Role *
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              onFocus={() => setFocusedField("role")}
-              onBlur={() => setFocusedField(null)}
-              style={{
-                ...styles.select,
-                ...(focusedField === "role" ? styles.inputFocus : {}),
-              }}
-              required
-            >
-              <option value="driver">🚍 Driver</option>
-              <option value="vendor">🚌 Bus Vendor</option>
-              <option value="mechanic">🔧 Mechanic</option>
-              <option value="cleaner">🧹 Cleaner</option>
-              <option value="restaurant">🍽 Restaurant</option>
-              <option value="parcel">📦 Parcel Vendor</option>
-            </select>
-          </label>
+          <div className="register-role-tabs" role="tablist" aria-label="Provider category">
+            {ROLE_OPTIONS.map((roleOption) => {
+              const meta = ROLE_META[roleOption];
+              const RoleIcon = meta.icon;
+              const isActive = form.role === roleOption;
 
-          <label style={styles.label}>
-            AddharNo <span style={styles.icon}>(Verification)</span>
-            <input
-              name="AddharNo"
-              value={form.AddharNo}
-              onChange={handleChange}
-              onFocus={() => setFocusedField("AddharNo")}
-              onBlur={() => setFocusedField(null)}
-              style={{
-                ...styles.input,
-                ...(focusedField === "AddharNo" ? styles.inputFocus : {}),
-              }}
-              placeholder="e.g., 8568-1241-7456"
-            />
-          </label>
-
-          <label style={styles.label}>
-            Address <span style={styles.icon}>(optional)</span>
-            <textarea
-              name="address"
-              value={form.address}
-              onChange={handleChange}
-              onFocus={() => setFocusedField("address")}
-              onBlur={() => setFocusedField(null)}
-              style={{
-                ...styles.textarea,
-                ...(focusedField === "address" ? styles.inputFocus : {}),
-              }}
-              placeholder="Enter your complete address"
-            />
-          </label>
-
-          <button
-            type="submit"
-            disabled={loading}
-            onMouseEnter={() => setButtonHover(true)}
-            onMouseLeave={() => setButtonHover(false)}
-            style={{
-              ...styles.button,
-              ...(buttonHover && !loading ? styles.buttonHover : {}),
-              ...(loading ? styles.buttonDisabled : {}),
-            }}
-          >
-            {loading ? "⏳ Registering..." : "✓ Register Now"}
-          </button>
+              return (
+                <button
+                  className={`register-role-tab${isActive ? " is-active" : ""}`}
+                  key={roleOption}
+                  type="button"
+                  onClick={() => handleRolePick(roleOption)}
+                  aria-pressed={isActive}
+                >
+                  <span className="register-role-tab-icon">
+                    <RoleIcon size={17} aria-hidden="true" />
+                  </span>
+                  <span>{meta.label}</span>
+                </button>
+              );
+            })}
+          </div>
 
           {msg && (
-            <div
-              style={{
-                ...styles.message,
-                ...(msg.type === "success"
-                  ? styles.messageSuccess
-                  : styles.messageError),
-              }}
-            >
-              {msg.type === "success" ? "✓ " : "✗ "}
-              {msg.text}
+            <div className={`register-message register-message-${msg.type}`} role="alert">
+              {msg.type === "success" ? (
+                <CheckCircle2 size={18} aria-hidden="true" />
+              ) : (
+                <AlertCircle size={18} aria-hidden="true" />
+              )}
+              <span>{msg.text}</span>
             </div>
           )}
-        </form>
-      </div>
 
-      {/* Success popup modal */}
-      {showSuccessPopup && (
-        <div style={styles.popupOverlay} role="dialog" aria-modal="true">
-          <div style={styles.popupCard}>
-            <div style={styles.popupTitle}>Registration Successful</div>
-            <div style={styles.popupText}>
-              {msg?.text || "You have been registered successfully."}
+          <form onSubmit={submit} className="register-form">
+            <div className="register-fields">
+              <label className="register-field">
+                <span className="register-label">
+                  <UserRound size={16} aria-hidden="true" />
+                  Full Name *
+                </span>
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="Enter full name"
+                  required
+                />
+              </label>
+
+              <label className="register-field">
+                <span className="register-label">
+                  <Phone size={16} aria-hidden="true" />
+                  Phone Number *
+                </span>
+                <input
+                  name="phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder="Enter phone number"
+                  required
+                />
+              </label>
+
+              <label className="register-field">
+                <span className="register-label">
+                  <Mail size={16} aria-hidden="true" />
+                  Email <span className="register-optional">optional</span>
+                </span>
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="your.email@example.com"
+                />
+              </label>
+
+              <label className="register-field">
+                <span className="register-label">
+                  <CurrentRoleIcon size={16} aria-hidden="true" />
+                  Role *
+                </span>
+                <select
+                  name="role"
+                  value={form.role}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="driver">Driver</option>
+                  <option value="vendor">BusVendor</option>
+                  <option value="parcel">ParcelVendor</option>
+                  <option value="mechanic">Mechanic</option>
+                  <option value="cleaner">Cleaner</option>
+                  {form.role === "restaurant" && (
+                    <option value="restaurant">Restaurant Partner</option>
+                  )}
+                </select>
+              </label>
+
+              <label className="register-field register-field-full">
+                <span className="register-label">
+                  <Fingerprint size={16} aria-hidden="true" />
+                  AddharNo <span className="register-optional">optional</span>
+                </span>
+                <input
+                  name="AddharNo"
+                  value={form.AddharNo}
+                  onChange={handleChange}
+                  placeholder="e.g. 8568-1241-7456"
+                />
+              </label>
+
+              <label className="register-field register-field-full">
+                <span className="register-label">
+                  <ClipboardList size={16} aria-hidden="true" />
+                  {currentRole.descriptionLabel} *
+                </span>
+                <textarea
+                  name="providerDescription"
+                  value={form.providerDescription}
+                  onChange={handleChange}
+                  placeholder={`Describe your ${currentRole.label.toLowerCase()}`}
+                  required
+                />
+              </label>
+
+              <label className="register-field register-field-full">
+                <span className="register-label">
+                  <Route size={16} aria-hidden="true" />
+                  {currentRole.label} Services *
+                </span>
+                <input
+                  name="providerServices"
+                  value={form.providerServices}
+                  onChange={handleChange}
+                  placeholder={currentRole.servicePlaceholder}
+                  required
+                />
+              </label>
+
+              <label className="register-field register-field-full">
+                <span className="register-label">
+                  <MapPin size={16} aria-hidden="true" />
+                  Address <span className="register-optional">optional</span>
+                </span>
+                <textarea
+                  name="address"
+                  value={form.address}
+                  onChange={handleChange}
+                  placeholder="Enter your business or service address"
+                />
+              </label>
             </div>
-            <button
-              style={styles.popupClose}
-              onClick={() => setShowSuccessPopup(false)}
-            >
+
+            <button type="submit" className="register-submit" disabled={loading}>
+              <Send size={18} aria-hidden="true" />
+              {loading ? "Registering..." : "Submit Registration"}
+            </button>
+          </form>
+        </section>
+      </section>
+
+      {showSuccessPopup && (
+        <div className="register-popup-overlay" role="dialog" aria-modal="true">
+          <div className="register-popup-card">
+            <CheckCircle2 size={38} aria-hidden="true" />
+            <div className="register-popup-title">Registration Sent</div>
+            <p>{msg?.text || "Your registration request has been received."}</p>
+            <button type="button" onClick={() => setShowSuccessPopup(false)}>
               Close
             </button>
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 };
 

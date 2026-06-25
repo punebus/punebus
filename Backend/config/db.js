@@ -4,10 +4,7 @@ import mongoose from "mongoose";
 export const connectDB = async (mongoURI) => {
   const uri = mongoURI || process.env.MONGO_URI || "mongodb://localhost:27017/Punebus";
   try {
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(uri);
 
     console.log("MongoDB connected:", uri.includes("mongodb+srv") ? "Atlas" : uri);
   } catch (err) {

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import mechanicImg from "../assets/mechanic.jpg";
 import driverImg from "../assets/driver.jpg";
 import namstey from "../assets/namstey-image.jpg";
 import max_seat from "../assets/max_seat2.jpg";
 import replacementBusImg from "../assets/replce_bus.jpg";
-import Footer from "./Footer";
 import roadImg from "../assets/RoadAssistance.jpg";
 
 /* ---------------------- Added helper utilities ---------------------- */
@@ -90,15 +89,14 @@ const localAdvertisers = [
 const ServicesPanel = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState("");
 
   // track hover for sponsors track
   const [trackHover, setTrackHover] = useState(false);
 
   // fallback/default services
-  const fallbackServices = [
+  const fallbackServices = useMemo(() => [
     // SILVER
     {
       id: "s1",
@@ -201,7 +199,7 @@ const ServicesPanel = () => {
       description: "Priority boarding and assistance for premium passengers.",
       package: "platinum",
     },
-  ];
+  ], []);
 
   useEffect(() => {
     fetch("/api/services")
@@ -212,19 +210,16 @@ const ServicesPanel = () => {
       .then((data) => {
         if (data && data.length > 0) {
           setServices(data);
-          setError(false);
         } else {
           setServices(fallbackServices);
-          setError(true);
         }
         setLoading(false);
       })
       .catch(() => {
         setServices(fallbackServices);
-        setError(true);
         setLoading(false);
       });
-  }, []);
+  }, [fallbackServices]);
 
   useEffect(() => {
     if (selectedService) {
@@ -566,9 +561,10 @@ const ServicesPanel = () => {
 
   return (
     <>
-      <div style={styles.container}>
+      <div className="services-app-page" style={styles.container}>
         {/* Heading Section */}
         <h1
+          className="services-app-title"
           style={{
             textAlign: "center",
             fontSize: "36px",
@@ -580,6 +576,7 @@ const ServicesPanel = () => {
           Our Service Packages
         </h1>
         <p
+          className="services-app-subtitle"
           style={{
             textAlign: "center",
             fontSize: "16px",
@@ -593,23 +590,37 @@ const ServicesPanel = () => {
 
         {/* (Optional) quick search box wired to existing searchQuery state */}
 
-        <div style={styles.cardsGrid}>
+        <div className="services-package-strip" style={styles.cardsGrid}>
           {packages.map((pkg) => {
             const pkgServices = filterServices(pkg.id);
             return (
-              <div key={pkg.id} style={styles.card}>
-                <div style={{ ...styles.cardHeader, background: pkg.gradient }}>
-                  <span style={styles.cardIcon}>{pkg.icon}</span>
-                  <h2 style={styles.cardTitle}>{pkg.title}</h2>
-                  <p style={styles.cardSubtitle}>{pkg.subtitle}</p>
+              <div
+                className={`services-package-card services-package-card-${pkg.id}`}
+                key={pkg.id}
+                style={styles.card}
+              >
+                <div
+                  className="services-package-head"
+                  style={{ ...styles.cardHeader, background: pkg.gradient }}
+                >
+                  <span className="services-package-icon" style={styles.cardIcon}>
+                    {pkg.icon}
+                  </span>
+                  <h2 className="services-package-title" style={styles.cardTitle}>
+                    {pkg.title}
+                  </h2>
+                  <p className="services-package-subtitle" style={styles.cardSubtitle}>
+                    {pkg.subtitle}
+                  </p>
                 </div>
 
-                <div style={styles.cardBody}>
+                <div className="services-package-body" style={styles.cardBody}>
                   {pkgServices.length > 0 ? (
-                    <ul style={styles.serviceList}>
+                    <ul className="services-package-list" style={styles.serviceList}>
                       {pkgServices.map((service, index) => (
                         <li key={service.id}>
                           <button
+                            className="services-package-service"
                             style={{
                               ...styles.serviceItem,
                               ...(hoveredItem === `${pkg.id}-${service.id}`
@@ -622,14 +633,23 @@ const ServicesPanel = () => {
                             }
                             onMouseLeave={() => setHoveredItem(null)}
                           >
-                            <div style={styles.serviceIconCircle}>
+                            <div
+                              className="services-package-service-icon"
+                              style={styles.serviceIconCircle}
+                            >
                               {getServiceIcon(index, service.id)}
                             </div>
                             <div>
-                              <div style={styles.serviceTitle}>
+                              <div
+                                className="services-package-service-title"
+                                style={styles.serviceTitle}
+                              >
                                 {service.title}
                               </div>
-                              <div style={styles.serviceDescription}>
+                              <div
+                                className="services-package-service-desc"
+                                style={styles.serviceDescription}
+                              >
                                 {service.description}
                               </div>
                             </div>
@@ -644,6 +664,7 @@ const ServicesPanel = () => {
                   )}
 
                   <button
+                    className="services-package-cta"
                     style={{
                       ...styles.ctaButton,
                       backgroundColor:
@@ -745,7 +766,7 @@ const ServicesPanel = () => {
           {/* Left: Image */}
           <div>
             <img
-              src={replacementBusImg}
+              src={highlightedImg}
               alt={highlightedTitle}
               style={styles.highlightedImage}
               loading="lazy"
@@ -1041,9 +1062,6 @@ const ServicesPanel = () => {
         {/* NOTE: The previous "Local Advertisers on Bus Image" section has been removed */}
       </div>
 
-      {/* --------------------------- Footer (MOVED OUTSIDE) --------------------------- */}
-      <Footer />
-      {/* -------------------------------------------------------------------- */}
     </>
   );
 };

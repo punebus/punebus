@@ -28,8 +28,8 @@ import {
   Navigation,
 } from "lucide-react";
 
-import Footer from "./Footer";
 import EnquiryForm from "./EnquiryForm";
+import "../style/homePage.css";
 
 /* ---------------------------
    Config
@@ -249,17 +249,24 @@ function EnquiryModal({ open, onClose }) {
    Hero Section (updated)
 ----------------------------*/
 const Hero = ({ onOpenEnquiry }) => {
+  const highlights = [
+    "Fleet support",
+    "Verified staff",
+    "Partner onboarding",
+  ];
+
   return (
     <section
       aria-label="Hero section"
+      className="home-hero"
       style={{
         position: "relative",
-        minHeight: "600px",
+        minHeight: "640px",
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
         overflow: "hidden",
-        background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+        background: "#0f172a",
       }}
     >
       <style>{`
@@ -294,7 +301,7 @@ const Hero = ({ onOpenEnquiry }) => {
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(135deg, rgba(15, 23, 42, 0.55) 0%, rgba(30, 64, 175, 0.45) 100%)",
+            "linear-gradient(90deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.66) 48%, rgba(21, 128, 61, 0.28) 100%)",
         }}
       />
 
@@ -311,20 +318,24 @@ const Hero = ({ onOpenEnquiry }) => {
           justifyContent: "flex-start",
         }}
       >
-        <div style={{ maxWidth: "600px", textAlign: "left" }}>
+        <div style={{ maxWidth: "690px", textAlign: "left" }}>
           <AnimatedSection>
+            <div className="home-hero-kicker">
+              <Bus size={18} />
+              PuneBus operator support platform
+            </div>
             <h1
               style={{
-                fontSize: "clamp(2.5rem, 6vw, 4rem)",
+                fontSize: "clamp(2.6rem, 6vw, 4.45rem)",
                 fontWeight: 800,
                 color: "#fff",
                 marginBottom: "1.25rem",
-                lineHeight: 1.1,
-                letterSpacing: "-0.02em",
+                lineHeight: 1.04,
+                letterSpacing: 0,
                 textShadow: "0 2px 20px rgba(0,0,0,0.25)",
               }}
             >
-              Your Trusted Partner for Complete Bus Services
+              Complete bus operations support in one place
             </h1>
 
             <p
@@ -337,44 +348,112 @@ const Hero = ({ onOpenEnquiry }) => {
                 textShadow: "0 1px 12px rgba(0,0,0,0.25)",
               }}
             >
-              From professional drivers to skilled mechanics — we take care of
-              everything your fleet needs.
+              From verified drivers and mechanics to fleet providers, parcel
+              partners and brand tie-ups, PuneBus helps operators keep routes
+              moving with reliable local support.
             </p>
 
-            <Button
-              size="lg"
-              onClick={onOpenEnquiry}
-              style={{
-                backgroundColor: "#1e40af",
-                color: "#fff",
-                fontSize: "1.125rem",
-                fontWeight: 600,
-                padding: "1.2rem 2.5rem",
-                boxShadow: "0 10px 30px rgba(30, 64, 175, 0.35)",
-                border: "none",
-              }}
-            >
-              Get a Quote
-            </Button>
+            <div className="home-hero-tags">
+              {highlights.map((item) => (
+                <span key={item}>{item}</span>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", marginTop: "1.85rem" }}>
+              <Button
+                size="lg"
+                href="/provider"
+                style={{
+                  backgroundColor: "#f59e0b",
+                  color: "#0f172a",
+                  fontSize: "1.125rem",
+                  fontWeight: 600,
+                  padding: "1.2rem 2.5rem",
+                  border: "none",
+                }}
+              >
+                Become a Provider
+                <ArrowRight style={{ width: 20, height: 20 }} />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={onOpenEnquiry}
+                style={{
+                  color: "#fff",
+                  borderColor: "rgba(255,255,255,0.65)",
+                  backgroundColor: "transparent",
+                  fontSize: "1.125rem",
+                  fontWeight: 600,
+                  padding: "1.2rem 2.5rem",
+                }}
+              >
+                Get a Quote
+              </Button>
+            </div>
           </AnimatedSection>
         </div>
       </div>
+    </section>
+  );
+};
 
-      {/* Decorative glow */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "-12%",
-          right: "-8%",
-          width: "420px",
-          height: "420px",
-          background:
-            "radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%)",
-          borderRadius: "50%",
-          filter: "blur(60px)",
-          pointerEvents: "none",
-        }}
-      />
+const HomeOverview = () => {
+  const stats = [
+    { value: "500+", label: "Operator conversations supported" },
+    { value: "24/7", label: "Roadside and enquiry readiness" },
+    { value: "3", label: "Provider categories onboarded" },
+  ];
+
+  const points = [
+    {
+      title: "For bus owners",
+      text: "Get drivers, mechanics, fleet backup, parcel integration and passenger support services.",
+    },
+    {
+      title: "For providers",
+      text: "List your buses, catering, parcel or local business services through one reviewed registration flow.",
+    },
+    {
+      title: "For partners",
+      text: "Build sponsorship, travel office and brand collaboration opportunities with PuneBus.",
+    },
+  ];
+
+  return (
+    <section className="home-overview" aria-label="PuneBus overview">
+      <div className="home-shell">
+        <AnimatedSection>
+          <div className="home-overview-grid">
+            <div>
+              <p className="home-eyebrow">Why PuneBus</p>
+              <h2>One platform for daily operations, provider support and partnerships.</h2>
+              <p>
+                PuneBus brings operator support, verified provider onboarding
+                and local business collaborations into a clear service network
+                for Pune routes.
+              </p>
+            </div>
+            <div className="home-stat-grid">
+              {stats.map((item) => (
+                <div className="home-stat-card" key={item.label}>
+                  <strong>{item.value}</strong>
+                  <span>{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </AnimatedSection>
+
+        <AnimatedSection className="home-point-grid">
+          {points.map((item) => (
+            <article className="home-point-card" key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </AnimatedSection>
+      </div>
     </section>
   );
 };
@@ -504,7 +583,7 @@ const VideoShowcase = () => {
 /* ---------------------------
    Services
 ----------------------------*/
-const Services = ({ onOpenEnquiry, phone }) => {
+const Services = ({ phone }) => {
   const services = [
     {
       icon: Users,
@@ -568,16 +647,6 @@ const Services = ({ onOpenEnquiry, phone }) => {
     },
   ];
 
-  // Title -> role value map (backend param unchanged)
-  const valueMap = {
-    "Driver Job Registration": "driver",
-    "Cleaner Job Registration": "cleaner",
-    "Mechanic Job Registration": "mechanic",
-    "Temporary Bus Provider Registration": "vendor",
-    "Parcel Partner Registration": "parcel",
-    "Hotel Vendor Registration": "restaurant",
-  };
-
   return (
     <section
       id="services"
@@ -621,9 +690,7 @@ const Services = ({ onOpenEnquiry, phone }) => {
             gap: "2rem",
           }}
         >
-          {services.map((service, index) => {
-            const regValue = valueMap[service.title] || "vendor";
-            return (
+          {services.map((service, index) => (
               <Card key={index}>
                 <CardHeader style={{ paddingBottom: "1rem" }}>
                   <div
@@ -740,19 +807,19 @@ const Services = ({ onOpenEnquiry, phone }) => {
                       display: "flex",
                       gap: "0.5rem",
                       alignItems: "center",
+                      flexWrap: "wrap",
                     }}
                   >
-                    {/* IMPORTANT: link carries the selected service */}
                     <Button
                       style={{
                         flex: "1 1 auto",
                         backgroundColor: service.color,
                         border: "none",
                       }}
-                      href={`/register?service=${encodeURIComponent(regValue)}`}
-                      aria-label={`Register for ${service.title}`}
+                      href={`tel:${phone}`}
+                      aria-label={`Enquire about ${service.title}`}
                     >
-                      Register Now
+                      Enquire Now
                     </Button>
 
                     <Button
@@ -768,8 +835,147 @@ const Services = ({ onOpenEnquiry, phone }) => {
                   </div>
                 </CardContent>
               </Card>
-            );
-          })}
+          ))}
+        </AnimatedSection>
+      </div>
+    </section>
+  );
+};
+
+const ProviderSection = () => {
+  const providerCards = [
+    {
+      title: "Driver",
+      description:
+        "Register professional drivers for route operations and temporary shift support.",
+      features: ["Verified driver profile", "Route support"],
+      image: driverImg,
+      color: "#2563eb",
+      role: "driver",
+    },
+    {
+      title: "BusVendor",
+      description:
+        "List your vehicles and offer temporary fleet support for Pune routes.",
+      features: ["Route-based service matching", "Verified operators only"],
+      image: replacementBusImg,
+      color: "#f97316",
+      role: "vendor",
+    },
+    {
+      title: "ParcelVendor",
+      description:
+        "Deliver packages securely along passenger routes and city drops.",
+      features: ["Real-time pickup support", "Safe parcel handling"],
+      image: parcelImg,
+      color: "#10b981",
+      role: "parcel",
+    },
+    {
+      title: "Mechanic",
+      description:
+        "Register repair and breakdown support for buses, depots and route operations.",
+      features: ["Breakdown response", "Vehicle diagnostics"],
+      image: mechanicImg,
+      color: "#2563eb",
+      role: "mechanic",
+    },
+    {
+      title: "Cleaner",
+      description:
+        "Offer bus cleaning, washing and hygiene services for fleet upkeep.",
+      features: ["Interior cleaning", "Depot wash support"],
+      image: cleanerImg,
+      color: "#0f766e",
+      role: "cleaner",
+    },
+  ];
+
+  return (
+    <section
+      aria-labelledby="provider-services-heading"
+      style={{ padding: "80px 1.5rem", backgroundColor: "#f8fafc" }}
+    >
+      <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <AnimatedSection>
+          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <h2
+              id="provider-services-heading"
+              style={{
+                fontSize: "clamp(2rem, 4vw, 2.5rem)",
+                fontWeight: "bold",
+                color: "#1e293b",
+                marginBottom: "1rem",
+              }}
+            >
+              Provider Services on PuneBus
+            </h2>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "#475569",
+                maxWidth: 760,
+                margin: "0 auto",
+              }}
+            >
+              Share your business services and get listed as a provider. Admin or manager will review your registration, approve it, and keep the full approval history.
+            </p>
+          </div>
+        </AnimatedSection>
+
+        <AnimatedSection
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "1.5rem",
+          }}
+        >
+          {providerCards.map((card, index) => (
+            <Card key={index}>
+              <div
+                style={{
+                  height: 240,
+                  backgroundColor: `${card.color}22`,
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={card.image}
+                  alt={card.title}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+              <CardContent>
+                <CardTitle style={{ fontSize: "1.25rem" }}>
+                  {card.title}
+                </CardTitle>
+                <CardDescription style={{ color: "#475569" }}>
+                  {card.description}
+                </CardDescription>
+                <ul
+                  style={{ listStyle: "none", padding: 0, margin: "1rem 0" }}
+                >
+                  {card.features.map((feature, fIndex) => (
+                    <li
+                      key={fIndex}
+                      style={{
+                        marginBottom: "0.65rem",
+                        color: "#334155",
+                      }}
+                    >
+                      • {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  href={`/register?role=${card.role}`}
+                  style={{ backgroundColor: card.color, border: "none" }}
+                >
+                  Provider Registration
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </AnimatedSection>
       </div>
     </section>
@@ -1008,7 +1214,7 @@ const InCityServices = ({ onOpenEnquiry }) => {
 /* ---------------------------
    CTA
 ----------------------------*/
-const CTA = ({ onOpenEnquiry }) => {
+const CTA = () => {
   return (
     <section
       aria-label="Call to action"
@@ -1056,7 +1262,7 @@ const CTA = ({ onOpenEnquiry }) => {
             >
               <Button
                 size="lg"
-                href="/register"
+                href="/register?role=vendor"
                 style={{
                   backgroundColor: "white",
                   color: "#1e40af",
@@ -1105,8 +1311,12 @@ export default function HomePage() {
       <main>
         <Hero onOpenEnquiry={openEnquiry} />
 
+        <HomeOverview />
+
         {/* 👇 Videos come immediately after the hero */}
         <VideoShowcase />
+
+        <ProviderSection />
 
         {/* Pass the modal opener + phone to Services */}
         <Services onOpenEnquiry={openEnquiry} phone={PHONE_NUMBER} />
@@ -1117,8 +1327,6 @@ export default function HomePage() {
 
         <CTA onOpenEnquiry={openEnquiry} />
       </main>
-
-      <Footer />
 
       {/* Modal lives at root so it overlays whole page */}
       <EnquiryModal open={showEnquiry} onClose={closeEnquiry} />

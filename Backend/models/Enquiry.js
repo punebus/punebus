@@ -25,6 +25,10 @@ const enquirySchema = new mongoose.Schema({
 
   // status enum (pending/done)
   status: { type: String, enum: ["pending", "done"], default: "pending" },
+  responseMessage: { type: String },
+  respondedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  respondedByRole: { type: String },
+  respondedAt: { type: Date },
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
