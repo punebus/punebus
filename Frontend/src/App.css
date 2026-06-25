@@ -1,11 +1,19 @@
 .app-shell {
   min-height: 100vh;
   min-height: 100dvh;
-  background: #f8fafc;
+  background: #0f172a;
 }
 
 .app-main {
   min-height: calc(100vh - 68px);
+  padding-top: var(--nav-height);
+}
+
+/* Hero page overrides: hero section covers full 100vh itself,
+   so we cancel the padding-top to avoid double spacing */
+.app-main > .home-hero-wrapper,
+.app-main > section:first-child.home-hero {
+  margin-top: calc(-1 * var(--nav-height));
 }
 
 @media (max-width: 768px) {

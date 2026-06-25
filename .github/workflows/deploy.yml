@@ -1,0 +1,106 @@
+name: CI/CD Pipeline - PuneBus VPS Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  VITE_API_BASE_URL: https://api.punebus.com
+  VITE_ADMIN_APP_URL: https://admin.punebus.com
+  VITE_MANAGER_APP_URL: https://manager.punebus.com
+  VITE_EXECUTOR_APP_URL: https://executor.punebus.com
+  VITE_FRONTEND_APP_URL: https://punebus.com
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out code from GitHub
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js Environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: |
+            Frontend/package-lock.json
+            Admin/package-lock.json
+            Manager/package-lock.json
+            Executor/package-lock.json
+            Backend/package-lock.json
+
+      # 3. Install Dependencies and Build Frontend (Main Web App)
+      - name: Build Frontend
+        run: |
+          cd Frontend
+          npm ci
+          npm run build
+
+      # 4. Install Dependencies and Build Admin Panel
+      - name: Build Admin Panel
+        run: |
+          cd Admin
+          npm ci
+          npm run build
+
+      # 5. Install Dependencies and Build Manager Panel
+      - name: Build Manager Panel
+        run: |
+          cd Manager
+          npm ci
+          npm run build
+
+      # 6. Install Dependencies and Build Executor Panel
+      - name: Build Executor Panel
+        run: |
+          cd Executor
+          npm ci
+          npm run build
+
+      # 7. Configure SSH and Deploy Files to VPS
+      - name: Deploy to VPS
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          VPS_IP: ${{ secrets.VPS_IP }}
+        run: |
+          # Create ssh directory and set up private key
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Add VPS to known hosts to prevent host verification interactive prompt
+          ssh-keyscan -H "$VPS_IP" >> ~/.ssh/known_hosts
+
+          # Sync built frontends using rsync (v - verbose, z - compress, r - recursive, delete - removes stale files)
+          echo "Deploying Frontend..."
+          rsync -avz --delete Frontend/dist/ root@$VPS_IP:/var/www/punebus/frontend/
+
+          echo "Deploying Admin..."
+          rsync -avz --delete Admin/dist/ root@$VPS_IP:/var/www/punebus/admin/
+
+          echo "Deploying Manager..."
+          rsync -avz --delete Manager/dist/ root@$VPS_IP:/var/www/punebus/manager/
+
+          echo "Deploying Executor..."
+          rsync -avz --delete Executor/dist/ root@$VPS_IP:/var/www/punebus/executor/
+
+          # Sync Backend files (exclude node_modules, local .env configuration, and .git folders)
+          echo "Deploying Backend..."
+          rsync -avz --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' Backend/ root@$VPS_IP:/var/www/punebus/backend/
+
+          # Sync Nginx files and Setup script for server-side maintenance
+          echo "Syncing server configurations..."
+          rsync -avz nginx/ root@$VPS_IP:/var/www/punebus/nginx/
+          rsync -avz setup-vps.sh root@$VPS_IP:/var/www/punebus/setup-vps.sh
+
+      # 8. Post-deployment Setup (npm install & PM2 restart)
+      - name: Post Deploy Operations on VPS
+        env:
+          VPS_IP: ${{ secrets.VPS_IP }}
+        run: |
+          ssh root@$VPS_IP "cd /var/www/punebus/backend && npm install --omit=dev && (pm2 restart punebus-backend || pm2 start app.js --name 'punebus-backend') && pm2 save"

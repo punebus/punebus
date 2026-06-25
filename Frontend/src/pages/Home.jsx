@@ -8,6 +8,7 @@ import parcelImg from "../assets/parcel.jpg";
 import silverVideo from "../assets/video/Silver.mp4";
 import GoldVideo from "../assets/video/gold_pakage.mp4";
 import homepageImg from "../assets/homepage.png";
+import dashboardVideo from "../assets/Video/dashboard.mp4";
 import restorentImg from "../assets/restorent.jpg";
 
 /* 👇 New images for the added service section (update paths as needed) */
@@ -26,6 +27,8 @@ import {
   CreditCard,
   Wrench,
   Navigation,
+  ClipboardList,
+  Handshake,
 } from "lucide-react";
 
 import EnquiryForm from "./EnquiryForm";
@@ -261,9 +264,9 @@ const Hero = ({ onOpenEnquiry }) => {
       className="home-hero"
       style={{
         position: "relative",
-        minHeight: "640px",
+        minHeight: "100vh",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "flex-start",
         overflow: "hidden",
         background: "#0f172a",
@@ -279,21 +282,29 @@ const Hero = ({ onOpenEnquiry }) => {
         }
       `}</style>
 
-      {/* Background Image */}
-      <div
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
         className="hero__bg"
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: `url(${homepageImg})`,
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "55% center",
-          animation: "heroPan 18s ease-in-out infinite alternate",
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
           opacity: 1,
           transform: "translateZ(0)",
+          filter: "contrast(1.12) saturate(1.25) brightness(1.05)",
+          willChange: "transform",
+          imageRendering: "auto",
         }}
-      />
+      >
+        <source src={dashboardVideo} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
 
       {/* Softer Overlay */}
       <div
@@ -310,7 +321,7 @@ const Hero = ({ onOpenEnquiry }) => {
         style={{
           maxWidth: "1280px",
           margin: "0 auto",
-          padding: "80px clamp(1.5rem, 4vw, 3rem)",
+          padding: "5rem clamp(1.5rem, 4vw, 3rem) 80px",
           position: "relative",
           zIndex: 10,
           width: "100%",
@@ -326,11 +337,11 @@ const Hero = ({ onOpenEnquiry }) => {
             </div>
             <h1
               style={{
-                fontSize: "clamp(2.6rem, 6vw, 4.45rem)",
+                fontSize: "clamp(1.8rem, 4vw, 2.75rem)",
                 fontWeight: 800,
                 color: "#fff",
                 marginBottom: "1.25rem",
-                lineHeight: 1.04,
+                lineHeight: 1.1,
                 letterSpacing: 0,
                 textShadow: "0 2px 20px rgba(0,0,0,0.25)",
               }}
@@ -338,20 +349,6 @@ const Hero = ({ onOpenEnquiry }) => {
               Complete bus operations support in one place
             </h1>
 
-            <p
-              style={{
-                fontSize: "clamp(1rem, 2vw, 1.25rem)",
-                color: "rgba(255,255,255,0.9)",
-                marginBottom: "2.25rem",
-                lineHeight: 1.6,
-                fontWeight: 400,
-                textShadow: "0 1px 12px rgba(0,0,0,0.25)",
-              }}
-            >
-              From verified drivers and mechanics to fleet providers, parcel
-              partners and brand tie-ups, PuneBus helps operators keep routes
-              moving with reliable local support.
-            </p>
 
             <div className="home-hero-tags">
               {highlights.map((item) => (
@@ -400,23 +397,26 @@ const Hero = ({ onOpenEnquiry }) => {
 
 const HomeOverview = () => {
   const stats = [
-    { value: "500+", label: "Operator conversations supported" },
-    { value: "24/7", label: "Roadside and enquiry readiness" },
-    { value: "3", label: "Provider categories onboarded" },
+    { value: "500+", label: "Operators supported" },
+    { value: "24/7", label: "Enquiry readiness" },
+    { value: "3", label: "Provider categories" },
   ];
 
   const points = [
     {
+      icon: Bus,
       title: "For bus owners",
-      text: "Get drivers, mechanics, fleet backup, parcel integration and passenger support services.",
+      text: "Drivers, mechanics & fleet backup — all in one place.",
     },
     {
+      icon: ClipboardList,
       title: "For providers",
-      text: "List your buses, catering, parcel or local business services through one reviewed registration flow.",
+      text: "One registration. Verified listing. Instant reach.",
     },
     {
+      icon: Handshake,
       title: "For partners",
-      text: "Build sponsorship, travel office and brand collaboration opportunities with PuneBus.",
+      text: "Sponsorship, travel offices & brand tie-ups with PuneBus.",
     },
   ];
 
@@ -427,12 +427,7 @@ const HomeOverview = () => {
           <div className="home-overview-grid">
             <div>
               <p className="home-eyebrow">Why PuneBus</p>
-              <h2>One platform for daily operations, provider support and partnerships.</h2>
-              <p>
-                PuneBus brings operator support, verified provider onboarding
-                and local business collaborations into a clear service network
-                for Pune routes.
-              </p>
+              <h2>One Platform.<br />Every Bus Need.</h2>
             </div>
             <div className="home-stat-grid">
               {stats.map((item) => (
@@ -446,10 +441,13 @@ const HomeOverview = () => {
         </AnimatedSection>
 
         <AnimatedSection className="home-point-grid">
-          {points.map((item) => (
-            <article className="home-point-card" key={item.title}>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
+          {points.map(({ icon: Icon, title, text }) => (
+            <article className="home-point-card" key={title}>
+              <div className="home-point-icon">
+                <Icon size={22} strokeWidth={2} />
+              </div>
+              <h3>{title}</h3>
+              <p>{text}</p>
             </article>
           ))}
         </AnimatedSection>
@@ -588,7 +586,7 @@ const Services = ({ phone }) => {
     {
       icon: Users,
       title: "Driver Job Registration",
-      subtitle: "Naukri chahiye? Yahan apply karein",
+      subtitle: "Apply here for professional driver positions",
       features: [
         "Police/Govt. verification preferred",
         "Experienced & Fresher drivers welcome",
@@ -599,7 +597,7 @@ const Services = ({ phone }) => {
     {
       icon: Wrench,
       title: "Cleaner Job Registration",
-      subtitle: "Bus cleaning/attendant ke liye apply",
+      subtitle: "Apply for bus maintenance & cleaning roles",
       features: ["Spot cleaning & full wash roles", "Daily/Monthly openings"],
       color: "#3b82f6",
       image: cleanerImg,
@@ -615,10 +613,10 @@ const Services = ({ phone }) => {
     {
       icon: Bus,
       title: "Temporary Bus Provider Registration",
-      subtitle: "Agency/Owner: apni bus list karein",
+      subtitle: "Agency/Owner: list your bus with us",
       features: [
         "Green-clearance certified preferred",
-        "Pune me temporary coverage ke liye",
+        "For temporary route coverage in Pune",
       ],
       color: "#f97316",
       image: replacementBusImg,
@@ -626,7 +624,7 @@ const Services = ({ phone }) => {
     {
       icon: Shield,
       title: "Parcel Partner Registration",
-      subtitle: "Delivery partner banne ke liye apply",
+      subtitle: "Apply to become a verified delivery partner",
       features: [
         "Fast & secure deliveries in Pune",
         "Real-time tracking & pickup",
@@ -675,10 +673,10 @@ const Services = ({ phone }) => {
                 margin: "0 auto",
               }}
             >
-              Yahan click karke register karein: agar aapko <b>job chahiye</b>{" "}
-              (driver/cleaner/mechanic) ya <b>hamare saath partner</b> banna
-              chahte hain, to form bhariye. Registration ke baad hum aapko
-              opportunities se jodenge.
+              Click here to register: whether you are looking for a <b>job</b>{" "}
+              (driver/cleaner/mechanic) or want to <b>partner with us</b>,
+              please fill out the form. We will connect you with available
+              opportunities after registration.
             </p>
           </div>
         </AnimatedSection>
@@ -846,45 +844,40 @@ const ProviderSection = () => {
   const providerCards = [
     {
       title: "Driver",
-      description:
-        "Register professional drivers for route operations and temporary shift support.",
-      features: ["Verified driver profile", "Route support"],
+      description: "Verified. Ready. On-route.",
+      features: ["Shift support", "Govt. verified"],
       image: driverImg,
       color: "#2563eb",
       role: "driver",
     },
     {
-      title: "BusVendor",
-      description:
-        "List your vehicles and offer temporary fleet support for Pune routes.",
-      features: ["Route-based service matching", "Verified operators only"],
+      title: "Bus Vendor",
+      description: "Your fleet. Our network.",
+      features: ["Route matching", "Operators only"],
       image: replacementBusImg,
       color: "#f97316",
       role: "vendor",
     },
     {
-      title: "ParcelVendor",
-      description:
-        "Deliver packages securely along passenger routes and city drops.",
-      features: ["Real-time pickup support", "Safe parcel handling"],
+      title: "Parcel Vendor",
+      description: "Fast pickups. Safe drops.",
+      features: ["Real-time support", "City-wide reach"],
       image: parcelImg,
       color: "#10b981",
       role: "parcel",
     },
     {
       title: "Mechanic",
-      description:
-        "Register repair and breakdown support for buses, depots and route operations.",
-      features: ["Breakdown response", "Vehicle diagnostics"],
+      description: "Breakdown? We respond.",
+      features: ["24/7 response", "Depot & roadside"],
       image: mechanicImg,
       color: "#2563eb",
       role: "mechanic",
     },
     {
       title: "Cleaner",
-      description:
-        "Offer bus cleaning, washing and hygiene services for fleet upkeep.",
-      features: ["Interior cleaning", "Depot wash support"],
+      description: "Clean fleet. Happy passengers.",
+      features: ["Interior wash", "Depot hygiene"],
       image: cleanerImg,
       color: "#0f766e",
       role: "cleaner",
@@ -902,80 +895,139 @@ const ProviderSection = () => {
             <h2
               id="provider-services-heading"
               style={{
-                fontSize: "clamp(2rem, 4vw, 2.5rem)",
-                fontWeight: "bold",
-                color: "#1e293b",
-                marginBottom: "1rem",
+                fontSize: "clamp(1.6rem, 3.5vw, 2.25rem)",
+                fontWeight: 800,
+                color: "#0f172a",
+                marginBottom: "0.6rem",
               }}
             >
-              Provider Services on PuneBus
+              Register as a <span style={{ color: "#2563eb" }}>Provider</span>
             </h2>
             <p
               style={{
-                fontSize: "1.125rem",
-                color: "#475569",
-                maxWidth: 760,
+                fontSize: "1rem",
+                color: "#64748b",
+                maxWidth: 520,
                 margin: "0 auto",
               }}
             >
-              Share your business services and get listed as a provider. Admin or manager will review your registration, approve it, and keep the full approval history.
+              List your service. Get reviewed. Start earning with PuneBus.
             </p>
           </div>
         </AnimatedSection>
 
-        <AnimatedSection
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "1.5rem",
-          }}
-        >
-          {providerCards.map((card, index) => (
-            <Card key={index}>
+        <AnimatedSection>
+          {/* Row 1 — 3 cards */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "1.5rem",
+              marginBottom: "1.5rem",
+            }}
+          >
+            {providerCards.slice(0, 3).map((card, index) => (
               <div
+                key={index}
                 style={{
-                  height: 240,
-                  backgroundColor: `${card.color}22`,
+                  display: "flex",
+                  flexDirection: "column",
+                  background: "#ffffff",
+                  borderRadius: 16,
                   overflow: "hidden",
+                  boxShadow: "0 2px 12px rgba(15,23,42,0.07)",
+                  border: "1px solid #e2e8f0",
+                  transition: "transform 0.22s, box-shadow 0.22s",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = "0 12px 30px rgba(15,23,42,0.12)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 12px rgba(15,23,42,0.07)";
                 }}
               >
-                <img
-                  src={card.image}
-                  alt={card.title}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
+                <div style={{ height: 200, overflow: "hidden" }}>
+                  <img src={card.image} alt={card.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+                <div style={{ padding: "1.25rem", display: "flex", flexDirection: "column", flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.4rem" }}>
+                    <span style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: card.color, flexShrink: 0 }} />
+                    <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 800, color: "#0f172a" }}>{card.title}</h3>
+                  </div>
+                  <p style={{ margin: "0 0 0.75rem", fontSize: "0.88rem", color: "#475569", fontWeight: 500 }}>{card.description}</p>
+                  <ul style={{ listStyle: "none", padding: 0, margin: "0 0 1rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                    {card.features.map((f, i) => (
+                      <li key={i} style={{ fontSize: "0.78rem", fontWeight: 700, color: card.color, background: `${card.color}15`, padding: "3px 10px", borderRadius: 999 }}>{f}</li>
+                    ))}
+                  </ul>
+                  <Button
+                    href={`/register?role=${card.role}`}
+                    style={{ backgroundColor: card.color, border: "none", marginTop: "auto", width: "100%", justifyContent: "center" }}
+                  >
+                    Provider Registration
+                  </Button>
+                </div>
               </div>
-              <CardContent>
-                <CardTitle style={{ fontSize: "1.25rem" }}>
-                  {card.title}
-                </CardTitle>
-                <CardDescription style={{ color: "#475569" }}>
-                  {card.description}
-                </CardDescription>
-                <ul
-                  style={{ listStyle: "none", padding: 0, margin: "1rem 0" }}
-                >
-                  {card.features.map((feature, fIndex) => (
-                    <li
-                      key={fIndex}
-                      style={{
-                        marginBottom: "0.65rem",
-                        color: "#334155",
-                      }}
-                    >
-                      • {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  href={`/register?role=${card.role}`}
-                  style={{ backgroundColor: card.color, border: "none" }}
-                >
-                  Provider Registration
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+            ))}
+          </div>
+
+          {/* Row 2 — 2 cards: left and middle columns */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "1.5rem",
+            }}
+          >
+            {providerCards.slice(3).map((card, index) => (
+              <div
+                key={index}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  background: "#ffffff",
+                  borderRadius: 16,
+                  overflow: "hidden",
+                  boxShadow: "0 2px 12px rgba(15,23,42,0.07)",
+                  border: "1px solid #e2e8f0",
+                  transition: "transform 0.22s, box-shadow 0.22s",
+                  gridColumn: index === 1 ? "2" : "auto",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = "0 12px 30px rgba(15,23,42,0.12)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 12px rgba(15,23,42,0.07)";
+                }}
+              >
+                <div style={{ height: 200, overflow: "hidden" }}>
+                  <img src={card.image} alt={card.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+                <div style={{ padding: "1.25rem", display: "flex", flexDirection: "column", flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.4rem" }}>
+                    <span style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: card.color, flexShrink: 0 }} />
+                    <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 800, color: "#0f172a" }}>{card.title}</h3>
+                  </div>
+                  <p style={{ margin: "0 0 0.75rem", fontSize: "0.88rem", color: "#475569", fontWeight: 500 }}>{card.description}</p>
+                  <ul style={{ listStyle: "none", padding: 0, margin: "0 0 1rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                    {card.features.map((f, i) => (
+                      <li key={i} style={{ fontSize: "0.78rem", fontWeight: 700, color: card.color, background: `${card.color}15`, padding: "3px 10px", borderRadius: 999 }}>{f}</li>
+                    ))}
+                  </ul>
+                  <Button
+                    href={`/register?role=${card.role}`}
+                    style={{ backgroundColor: card.color, border: "none", marginTop: "auto", width: "100%", justifyContent: "center" }}
+                  >
+                    Provider Registration
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </AnimatedSection>
       </div>
     </section>
@@ -1307,7 +1359,7 @@ export default function HomePage() {
   const closeEnquiry = () => setShowEnquiry(false);
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "white" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "white", marginTop: "calc(-1 * var(--nav-height))" }}>
       <main>
         <Hero onOpenEnquiry={openEnquiry} />
 

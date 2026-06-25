@@ -70,7 +70,17 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showEnquiry, setShowEnquiry] = useState(false);
   const [exiting, setExiting] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const adminAppUrl = import.meta.env.VITE_ADMIN_APP_URL || 'http://127.0.0.1:5174';
+
+  // Detect when user scrolls past the hero section (~80% of viewport height)
+  useEffect(() => {
+    const threshold = window.innerHeight * 0.8;
+    const handleScroll = () => setScrolled(window.scrollY > threshold);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // run once on mount
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleMobileMenu = () => setMobileMenuOpen((p) => !p);
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -110,7 +120,7 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="nav">
+      <header className={`nav${scrolled ? ' nav--scrolled' : ''}`}>
         <div className="container">
 
           {/* Brand Text */}
