@@ -142,3 +142,13 @@ export const rejectProvider = async (req, res) => {
 
   res.json({ message: "Provider rejected", provider, emailSent: emailResult.sent });
 };
+
+export const deleteProvider = async (req, res) => {
+  const { id } = req.params;
+  const provider = await User.findById(id);
+  if (!provider || !isProviderRole(provider.role)) {
+    return res.status(404).json({ message: "Provider not found" });
+  }
+  await User.findByIdAndDelete(id);
+  res.json({ message: "Provider deleted" });
+};

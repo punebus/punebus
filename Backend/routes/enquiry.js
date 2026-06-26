@@ -6,6 +6,7 @@ import {
   listEnquiries,
   getEnquiry,
   deleteEnquiry,
+  updateEnquiry,
   updateEnquiryStatus,
   respondToEnquiry,
 } from "../controllers/enquiryController.js";
@@ -48,6 +49,7 @@ router.post(
 router.get("/", protect, roleOnly(["admin", "manager", "executor"]), listEnquiries);
 router.get("/:id", protect, roleOnly(["admin", "manager", "executor"]), getEnquiry);
 router.delete("/:id", protect, adminOnly, deleteEnquiry);
+router.put("/:id", protect, adminOnly, updateEnquiry);
 
 router.put(
   "/:id/status",

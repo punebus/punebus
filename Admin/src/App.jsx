@@ -73,6 +73,10 @@ function Login({ onLogin }) {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState("");
 
   const submit = async (event) => {
     event.preventDefault();
@@ -90,6 +94,58 @@ function Login({ onLogin }) {
       setLoading(false);
     }
   };
+
+  const submitForgot = async (event) => {
+    event.preventDefault();
+    setForgotLoading(true);
+    setForgotMsg("");
+    try {
+      const res = await api.post("/api/auth/forgot-password", { email: forgotEmail });
+      setForgotMsg(res.data.message);
+    } catch (err) {
+      setForgotMsg(err?.response?.data?.message || "Failed to send reset email");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  if (showForgot) {
+    return (
+      <main className="login-page">
+        <form className="login-card" onSubmit={submitForgot}>
+          <p className="eyebrow">PuneBus Control</p>
+          <h1>Forgot Password</h1>
+          <p style={{ color: "#aaa", fontSize: "0.875rem", marginBottom: "1rem" }}>
+            Enter your admin email and we&apos;ll send you a reset link.
+          </p>
+          <label className="field">
+            Email
+            <input
+              type="email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              required
+            />
+          </label>
+          <button className="primary-btn" disabled={forgotLoading} type="submit">
+            {forgotLoading ? "Sending..." : "Send Reset Link"}
+          </button>
+          {forgotMsg && (
+            <p className={`message ${forgotMsg.includes("sent") ? "success" : "error"}`}>
+              {forgotMsg}
+            </p>
+          )}
+          <button
+            type="button"
+            className="link-btn"
+            onClick={() => { setShowForgot(false); setForgotMsg(""); }}
+          >
+            ← Back to Login
+          </button>
+        </form>
+      </main>
+    );
+  }
 
   return (
     <main className="login-page">
@@ -114,10 +170,19 @@ function Login({ onLogin }) {
             required
           />
         </label>
-        <button className="primary-btn" disabled={loading} type="submit">
-          {loading ? "Logging in..." : "Login"}
-        </button>
         {message && <p className="message error">{message}</p>}
+        <div className="login-actions">
+          <button className="primary-btn" disabled={loading} type="submit">
+            {loading ? "Logging in..." : "Login"}
+          </button>
+          <button
+            type="button"
+            className="link-btn"
+            onClick={() => { setShowForgot(true); setMessage(""); }}
+          >
+            Forgot Password?
+          </button>
+        </div>
       </form>
     </main>
   );
@@ -361,6 +426,31 @@ function Dashboard({ admin, onLogout }) {
     }
   };
 
+  const deleteProvider = async (provider) => {
+    if (!window.confirm(`Delete registration for "${provider.name}"? This cannot be undone.`)) return;
+    setProviderMessage("");
+    try {
+      await api.delete(`/api/providers/${provider._id}`);
+      setProviderMessage("Provider deleted");
+      loadProviders();
+      loadStats();
+    } catch (err) {
+      setProviderMessage(err?.response?.data?.message || "Unable to delete provider");
+    }
+  };
+
+  const deleteEnquiry = async (enquiry) => {
+    if (!window.confirm(`Delete enquiry from "${enquiry.contactPersonName || enquiry.companyName}"? This cannot be undone.`)) return;
+    setEnquiryMessage("");
+    try {
+      await api.delete(`/api/enquiry/${enquiry._id}`);
+      setEnquiryMessage("Enquiry deleted");
+      loadEnquiries();
+    } catch (err) {
+      setEnquiryMessage(err?.response?.data?.message || "Unable to delete enquiry");
+    }
+  };
+
   const sendEnquiryResponse = async (enquiry) => {
     const responseMessage = String(responseDrafts[enquiry._id] || "").trim();
     if (!responseMessage) {
@@ -379,7 +469,7 @@ function Dashboard({ admin, onLogout }) {
     }
   };
 
-  return (
+  return (<>
     <main className="dashboard">
       <aside className="sidebar">
         <div className="brand-block">
@@ -621,6 +711,9 @@ function Dashboard({ admin, onLogout }) {
                               Reject
                             </button>
                           )}
+                          <button className="danger-btn small-btn" type="button" onClick={() => deleteProvider(provider)}>
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -680,9 +773,14 @@ function Dashboard({ admin, onLogout }) {
                           onChange={(e) => setResponseDrafts((current) => ({ ...current, [enquiry._id]: e.target.value }))}
                           placeholder="Write response for customer email"
                         />
-                        <button className="primary-btn small-btn" type="button" onClick={() => sendEnquiryResponse(enquiry)}>
-                          Send Response
-                        </button>
+                        <div className="row-actions" style={{ marginTop: "0.4rem" }}>
+                          <button className="primary-btn small-btn" type="button" onClick={() => sendEnquiryResponse(enquiry)}>
+                            Send Response
+                          </button>
+                          <button className="danger-btn small-btn" type="button" onClick={() => deleteEnquiry(enquiry)}>
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -750,12 +848,74 @@ function Dashboard({ admin, onLogout }) {
         </section>
       </section>
     </main>
-  );
+
+  </>);
 }
+
 
 export default function App() {
   const [admin, setAdmin] = useState(readAdmin);
   const token = localStorage.getItem("adminToken");
+
+  // Handle reset password token in URL
+  const resetToken = new URLSearchParams(window.location.search).get("resetToken");
+  const [resetPwd, setResetPwd] = useState("");
+  const [resetConfirm, setResetConfirm] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMsg, setResetMsg] = useState("");
+  const [resetDone, setResetDone] = useState(false);
+
+  const submitReset = async (e) => {
+    e.preventDefault();
+    if (resetPwd !== resetConfirm) {
+      setResetMsg("Passwords do not match");
+      return;
+    }
+    if (resetPwd.length < 6) {
+      setResetMsg("Password must be at least 6 characters");
+      return;
+    }
+    setResetLoading(true);
+    setResetMsg("");
+    try {
+      const res = await api.post("/api/auth/reset-password", { token: resetToken, password: resetPwd });
+      setResetMsg(res.data.message);
+      setResetDone(true);
+      // Clear token from URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } catch (err) {
+      setResetMsg(err?.response?.data?.message || "Failed to reset password");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  if (resetToken && !resetDone) {
+    return (
+      <main className="login-page">
+        <form className="login-card" onSubmit={submitReset}>
+          <p className="eyebrow">PuneBus Control</p>
+          <h1>Set New Password</h1>
+          <label className="field">
+            New Password
+            <input type="password" value={resetPwd} onChange={(e) => setResetPwd(e.target.value)} required />
+          </label>
+          <label className="field">
+            Confirm Password
+            <input type="password" value={resetConfirm} onChange={(e) => setResetConfirm(e.target.value)} required />
+          </label>
+          <button className="primary-btn" disabled={resetLoading} type="submit">
+            {resetLoading ? "Updating..." : "Change Password"}
+          </button>
+          {resetMsg && (
+            <p className={`message ${resetMsg.includes("success") || resetMsg.includes("updated") ? "success" : "error"}`}>
+              {resetMsg}
+            </p>
+          )}
+        </form>
+      </main>
+    );
+  }
 
   const logout = () => {
     localStorage.removeItem("adminToken");

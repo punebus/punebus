@@ -69,6 +69,27 @@ export const deleteEnquiry = async (req, res) => {
   }
 };
 
+export const updateEnquiry = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const allowedFields = [
+      "companyName", "companyDetails", "contactPersonName", "contactNo",
+      "email", "address", "companyAddress", "membership", "status",
+      "numberOfFleet", "responseMessage",
+    ];
+    const updates = {};
+    for (const key of allowedFields) {
+      if (key in req.body) updates[key] = req.body[key];
+    }
+    const updated = await Enquiry.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+    if (!updated) return res.status(404).json({ message: "Enquiry not found" });
+    res.json({ message: "Enquiry updated", enquiry: updated });
+  } catch (err) {
+    console.error("updateEnquiry:", err);
+    res.status(500).json({ message: "Server error while updating enquiry" });
+  }
+};
+
 // update status (admin only)
 export const updateEnquiryStatus = async (req, res) => {
   try {

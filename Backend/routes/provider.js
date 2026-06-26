@@ -6,6 +6,7 @@ import {
   managerApproveProvider,
   approveProvider,
   rejectProvider,
+  deleteProvider,
 } from "../controllers/providerController.js";
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.get("/:id", roleOnly(["admin", "manager"]), getProviderById);
 router.put("/:id/manager-approve", roleOnly(["manager"]), managerApproveProvider);
 router.put("/:id/approve", adminOnly, approveProvider);
 router.put("/:id/reject", adminOnly, rejectProvider);
+router.delete("/:id", adminOnly, deleteProvider);
 
 export default router;

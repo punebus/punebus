@@ -5,6 +5,8 @@ import {
   managerLogin,
   executorLogin,
   getMe,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/authController.js";
 import { protect } from "../middleware/auth.js";
 
@@ -26,5 +28,8 @@ router.post("/manager/login", managerLogin);
 router.post("/executor/login", executorLogin);
 
 router.get("/me", protect, getMe);
+
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 export default router;

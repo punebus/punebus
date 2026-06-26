@@ -1,6 +1,8 @@
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import { signJwt } from "../utils/jwt.js";
+import { sendEmail } from "../utils/email.js";
 
 const PANEL_ROLES = ["admin", "manager", "executor"];
 
@@ -111,4 +113,59 @@ export const getMe = async (req, res) => {
       providerServices: req.user.providerServices,
     },
   });
+};
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  const user = await User.findOne({ email: email.trim().toLowerCase() });
+  if (!user) {
+    // Don't reveal if email exists for security - still return 200
+    return res.json({ message: "If that email is registered, a reset link has been sent." });
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+  await user.save();
+
+  const origin = req.headers.origin || process.env.ADMIN_URL || "http://localhost:5174";
+  const resetLink = `${origin}/?resetToken=${token}`;
+
+  await sendEmail({
+    to: user.email,
+    subject: "PuneBus Password Reset",
+    text: `Hello ${user.name},\n\nYou requested a password reset. Click the link below to set a new password:\n\n${resetLink}\n\nThis link expires in 1 hour. If you did not request this, please ignore this email.\n\nPuneBus Team`,
+    html: `<p>Hello <strong>${user.name}</strong>,</p><p>You requested a password reset. Click the link below:</p><p><a href="${resetLink}">${resetLink}</a></p><p>This link expires in <strong>1 hour</strong>. If you did not request this, please ignore this email.</p><p>PuneBus Team</p>`,
+  });
+
+  res.json({ message: "If that email is registered, a reset link has been sent." });
+};
+
+export const resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) {
+    return res.status(400).json({ message: "Token and password are required" });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ message: "Password must be at least 6 characters" });
+  }
+
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: new Date() },
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: "Reset link is invalid or has expired" });
+  }
+
+  const hashed = await bcrypt.hash(password, 10);
+  user.password = hashed;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.json({ message: "Password updated successfully. You can now log in." });
 };
