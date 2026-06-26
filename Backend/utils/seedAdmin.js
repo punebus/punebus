@@ -10,10 +10,10 @@ const run = async () => {
     // connect (will use process.env.MONGO_URI if not passed)
     await connectDB();
 
-    const email = process.env.SEED_ADMIN_EMAIL || "admin@punebus.com";
-    const password = process.env.SEED_ADMIN_PASSWORD || "admin1234";
+    const email = process.env.SEED_ADMIN_EMAIL || "rlrp2020@gmail.com";
+    const password = process.env.SEED_ADMIN_PASSWORD || "Worknai009##";
     const name = process.env.SEED_ADMIN_NAME || "PuneBus Admin";
-    const phone = process.env.SEED_ADMIN_PHONE || "0000000000";
+    const phone = process.env.SEED_ADMIN_PHONE || "9923400506";
 
     const hashed = await bcrypt.hash(password, 10);
 
